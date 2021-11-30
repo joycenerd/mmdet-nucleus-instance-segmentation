@@ -10,12 +10,13 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--mode',type=str,default='train',help='train or val')
 parser.add_argument('--data_root',type=str,default='/eva_data/zchin/nucleus_data')
 parser.add_argument('--mask_root',type=str,default='/eva_data/zchin/dataset/train')
+parser.add_argument('--out_dir',type=str,default='/eva_data/zchin/nucleus_data/annotations')
 args=parser.parse_args()
 
 
 dataset = Dataset('nuclei') # 先定义一个数据库对象，后续需要往里面添加具体的image和annotation
 
-def convert(data_list,mask_list,mode):
+def convert(data_list,mask_list,mode,annot_dir):
     for idx,(file,path) in enumerate(zip(data_list,mask_list)):
         name=file.split('/')[-1]
         image = cv2.imread(file)[:,:,::-1]
@@ -48,12 +49,15 @@ def convert(data_list,mask_list,mode):
         print(f'{name} complete...')
         
     t = dataset.coco() # 将dataset转化为coco格式的，还可以转化为yolo等格式
-    with open(f'instance_{mode}.json', 'w') as output_json_file: # 最后输出为json数据
+    with open(f'{annot_dir}/instance_{mode}.json', 'w') as output_json_file: # 最后输出为json数据
         json.dump(t, output_json_file,indent=4)
 
 
 if __name__=='__main__':
     data_path=os.path.join(args.data_root,args.mode)
+    annot_dir=os.path.join(args.data_root,'annotations')
+    if not os.path.isdir(annot_dir):
+        os.mkdir(annot_dir)
     data_list=[data_name for data_name in glob.glob(f'{data_path}/*.png')]
     mask_list=[]
 
@@ -71,4 +75,4 @@ if __name__=='__main__':
     #         json.dump(out, output_json_file,indent=4)
     #     print(f'{data_path} complete...')
     #     break
-    convert(data_list,mask_list,args.mode)
+    convert(data_list,mask_list,args.mode,annot_dir)
