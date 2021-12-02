@@ -4,6 +4,7 @@ import os
 
 import mmcv
 from PIL import Image
+import json
 
 
 def parse_args():
@@ -23,6 +24,7 @@ def parse_args():
         type=str,
         nargs='+',
         help='The suffix of images to be excluded, such as "png" and "bmp"')
+    parser.add_argument('--imgid_json',type=str,help='testing image id')
     args = parser.parse_args()
     return args
 
@@ -46,7 +48,7 @@ def collect_image_infos(path, exclude_extensions=None):
     return img_infos
 
 
-def cvt_to_coco_json(img_infos, classes):
+def cvt_to_coco_json(img_infos, classes,imgid_dict):
     image_id = 0
     coco = dict()
     coco['images'] = []
@@ -66,7 +68,8 @@ def cvt_to_coco_json(img_infos, classes):
         file_name = img_dict['filename']
         assert file_name not in image_set
         image_item = dict()
-        image_item['id'] = int(image_id)
+        # image_item['id'] = int(image_id)
+        image_item['id']= imgid_dict[file_name.split('/')[-1]]
         image_item['file_name'] = str(file_name)
         image_item['height'] = int(img_dict['height'])
         image_item['width'] = int(img_dict['width'])
@@ -75,6 +78,18 @@ def cvt_to_coco_json(img_infos, classes):
 
         image_id += 1
     return coco
+
+
+def get_id_dict(imgid_json):
+    f = open(imgid_json)
+    data=json.load(f)
+
+    imgid_dict={}
+    for img_info in data:
+        file_name=img_info['file_name']
+        imgid_dict[file_name]=img_info['id']
+
+    return imgid_dict       
 
 
 def main():
@@ -87,7 +102,9 @@ def main():
 
     # 2 convert to coco format data
     classes = mmcv.list_from_file(args.classes)
-    coco_info = cvt_to_coco_json(img_infos, classes)
+    imgid_dict=get_id_dict(args.imgid_json)
+    # print(imgid_dict)
+    coco_info = cvt_to_coco_json(img_infos, classes,imgid_dict)
 
     # 3 dump
     save_dir = os.path.join(args.img_path, '..', 'annotations')
