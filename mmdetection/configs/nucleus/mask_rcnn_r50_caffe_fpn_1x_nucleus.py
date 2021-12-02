@@ -5,7 +5,21 @@ _base_ = '../mask_rcnn/mask_rcnn_r50_caffe_fpn_mstrain-poly_1x_coco.py'
 model = dict(
     roi_head=dict(
         bbox_head=dict(num_classes=1),
-        mask_head=dict(num_classes=1)))
+        mask_head=dict(num_classes=1)),
+    backbone=dict(
+        with_cp=True
+    ),
+    train_cfg=dict(
+        rpn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                gpu_assign_thr=1000)),
+        rcnn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                gpu_assign_thr=1000))
+    )
+)
 
 # Modify dataset related settings
 dataset_type = 'COCODataset'
@@ -32,17 +46,17 @@ data = dict(
     samples_per_gpu=1,
     workers_per_gpu=1,
     train=dict(
-        img_prefix='/work/zchin31415/nucleus_data/train/',
+        img_prefix='/eva_data/zchin/nucleus_data/train/',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_train_copy.json'),
+        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_train_copy.json'),
     val=dict(
-        img_prefix='/work/zchin31415/nucleus_data/val',
+        img_prefix='/eva_data/zchin/nucleus_data/val',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json'),
+        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_val.json'),
     test=dict(
-        img_prefix='/work/zchin31415/nucleus_data/test',
+        img_prefix='/eva_data/zchin/nucleus_data/test',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_test.json'),
+        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_test.json'),
         pipelines = [
         dict(type='LoadImageFromFile'),
         dict(
@@ -58,6 +72,5 @@ data = dict(
                 dict(type='Collect', keys=['img']),
             ])
         ])
-        
     
-load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r50_caffe_fpn_1x_coco_bbox_mAP-0.38__segm_mAP-0.344_20200504_231812-0ebd1859.pth'
+load_from ='/home/zchin/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r50_caffe_fpn_1x_coco_bbox_mAP-0.38__segm_mAP-0.344_20200504_231812-0ebd1859.pth'
