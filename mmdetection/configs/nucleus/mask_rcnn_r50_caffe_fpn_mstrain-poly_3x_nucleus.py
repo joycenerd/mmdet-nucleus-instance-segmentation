@@ -9,16 +9,16 @@ model = dict(
     backbone=dict(
         with_cp=True
     ),
-    train_cfg=dict(
-        rpn=dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                gpu_assign_thr=1000)),
-        rcnn=dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                gpu_assign_thr=1000))
-    )
+    # train_cfg=dict(
+    #     rpn=dict(
+    #         assigner=dict(
+    #             type='MaxIoUAssigner',
+    #             gpu_assign_thr=1000)),
+    #     rcnn=dict(
+    #         assigner=dict(
+    #             type='MaxIoUAssigner',
+    #             gpu_assign_thr=1000))
+    # )
 )
 
 # Modify dataset related settings
@@ -73,4 +73,4 @@ data = dict(
             ])
         ])
     
-load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r50_caffe_fpn_1x_coco_bbox_mAP-0.38__segm_mAP-0.344_20200504_231812-0ebd1859.pth'
+load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_coco_bbox_mAP-0.408__segm_mAP-0.37_20200504_163245-42aa3d00.pth'
