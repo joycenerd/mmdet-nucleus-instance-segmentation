@@ -118,7 +118,8 @@ def mask_target_single(pos_proposals, pos_assigned_gt_inds, gt_masks, cfg):
             mask_size,
             device=device,
             inds=pos_assigned_gt_inds,
-            binarize=binarize).to_ndarray()
+            # binarize=binarize
+            ).to_ndarray()
 
         mask_targets = torch.from_numpy(mask_targets).float().to(device)
     else:
