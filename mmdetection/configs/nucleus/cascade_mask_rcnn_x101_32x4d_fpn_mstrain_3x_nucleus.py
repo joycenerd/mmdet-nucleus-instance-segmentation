@@ -1,5 +1,5 @@
 # The new config inherits a base config to highlight the necessary modification
-_base_ = '../cascade_rcnn/cascade_mask_rcnn_x101_64x4d_fpn_1x_coco.py'
+_base_ = '../cascade_rcnn/cascade_mask_rcnn_x101_32x4d_fpn_mstrain_3x_coco.py'
 
 # We also need to change the num_classes in head to match the dataset's annotation
 model = dict(
@@ -14,7 +14,7 @@ model = dict(
 )
 
 # Modify dataset related settings
-# dataset_type = 'COCODataset'
+dataset_type = 'CocoDataset'
 classes = ('nucleus',)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
 
@@ -27,7 +27,11 @@ test_pipeline = [
        transforms=[
            dict(type='Resize', keep_ratio=True),
            dict(type='RandomFlip'),
-           dict(type='Normalize', mean=[0, 0, 0], std=[1, 1, 1]),
+           dict(
+            type='Normalize',
+            mean=[123.675, 116.28, 103.53],
+            std=[58.395, 57.12, 57.375],
+            to_rgb=True),
            dict(type='Pad', size_divisor=32),
            dict(type='DefaultFormatBundle'),
            dict(type='Collect', keys=['img']),
@@ -57,21 +61,36 @@ data = dict(
     samples_per_gpu=1,
     workers_per_gpu=1,
     train=dict(
-        img_prefix='/work/zchin31415/nucleus_data/train',
-        classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_train_copy.json',
-        pipeline=train_pipeline),   
-    val=dict(
-        img_prefix='/work/zchin31415/nucleus_data/val',
-        classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json',
-        # pipeline = test_pipeline
+        type='RepeatDataset',
+        times=3,
+        dataset=dict(
+            type='CocoDataset',
+            ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+            img_prefix='/work/zchin31415/nucleus_data/all_train',
+            # classes=('tennis', )
+            pipeline=train_pipeline
         ),
-    test=dict(
-        img_prefix='/work/zchin31415/nucleus_data/test',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_test.json'),
-        # pipeline = test_pipeline
-        )
+        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        img_prefix='/work/zchin31415/nucleus_data/all_train'),
+    val=dict(
+        type=dataset_type,
+        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        img_prefix='/work/zchin31415/nucleus_data/all_train',
+        # spipeline=test_pipeline,
+        classes=classes),
+    test=dict(
+        type=dataset_type,
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_test.json',
+        img_prefix='/work/zchin31415/nucleus_data/test',
+        pipeline=test_pipeline,
+        classes=classes)
+    # test=dict(
+    #     type=dataset_type,
+    #     ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json',
+    #     img_prefix='/work/zchin31415/nucleus_data/val/',
+    #     pipeline=test_pipeline,
+    #     classes=classes)
+)
     
-load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/cascade_mask_rcnn_x101_64x4d_fpn_1x_coco_20200203-9a2db89d.pth'
+load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/cascade_mask_rcnn_x101_32x4d_fpn_mstrain_3x_coco_20210706_225234-40773067.pth'

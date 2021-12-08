@@ -26,21 +26,25 @@ dataset_type = 'CocoDataset'
 classes = ('nucleus',)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
 
+# use caffe img_norm
+img_norm_cfg = dict(
+    mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
+
 test_pipeline = [
-   dict(type='LoadImageFromFile'),
-   dict(
-       type='MultiScaleFlipAug',
-       img_scale=(1333, 800),
-       flip=False,
-       transforms=[
-           dict(type='Resize', keep_ratio=True),
-           dict(type='RandomFlip'),
-           dict(type='Normalize', mean=[0, 0, 0], std=[1, 1, 1]),
-           dict(type='Pad', size_divisor=32),
-           dict(type='DefaultFormatBundle'),
-           dict(type='Collect', keys=['img']),
-       ])
-   ]
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(1333, 800),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(type='Normalize', **img_norm_cfg),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle', keys=['img']),
+            dict(type='Collect', keys=['img']),
+        ])
+]
 
 data = dict(
     samples_per_gpu=1,
@@ -64,9 +68,9 @@ data = dict(
         classes=classes),
     test=dict(
         type=dataset_type,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_test.json',
-        img_prefix='/work/zchin31415/nucleus_data/test',
-        # pipeline=test_pipeline,
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json',
+        img_prefix='/work/zchin31415/nucleus_data/val',
+        pipeline=test_pipeline,
         classes=classes)
 )
     

@@ -6,24 +6,24 @@ model = dict(
     roi_head=dict(
         bbox_head=dict(num_classes=1),
         mask_head=dict(num_classes=1)),
-    backbone=dict(
-        with_cp=True
-    ),
-    train_cfg=dict(
-        rpn=dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                gpu_assign_thr=1000)),
-        rcnn=dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                gpu_assign_thr=1000))
-    )
+    # backbone=dict(
+    #     with_cp=True
+    # ),
+    # train_cfg=dict(
+    #     rpn=dict(
+    #         assigner=dict(
+    #             type='MaxIoUAssigner',
+    #             gpu_assign_thr=1000)),
+    #     rcnn=dict(
+    #         assigner=dict(
+    #             type='MaxIoUAssigner',
+    #             gpu_assign_thr=1000))
+    # )
 )
 
 # Modify dataset related settings
 dataset_type = 'CocoDataset'
-classes = ('nucleus',)
+classes = ('nuclei',)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
 
 test_pipelines = [
@@ -46,13 +46,13 @@ data = dict(
     samples_per_gpu=1,
     workers_per_gpu=1,
     train=dict(
-        img_prefix='/work/zchin31415/nucleus_data/train/',
+        img_prefix='/work/zchin31415/nucleus_data/all_train/',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_train_copy.json'),
+        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json'),
     val=dict(
-        img_prefix='/work/zchin31415/nucleus_data/val',
+        img_prefix='/work/zchin31415/nucleus_data/all_train',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json'),
+        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json'),
     test=dict(
         img_prefix='/work/zchin31415/nucleus_data/test',
         classes=classes,
