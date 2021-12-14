@@ -23,20 +23,20 @@ git clone https://github.com/joycenerd/mmdet-nucleus-instance-segmentation.git
 
 You need to have [Anaconda](https://www.anaconda.com/) or Miniconda already installed in your environment. To install requirements:
 
-1. Create a conda environment
+### 1. Create a conda environment
 ```
 conda create -n openmmlab python=3.7 -y
 conda activate openmmlab
 ```
 
-2. Install mmdetection
+### 2. Install mmdetection
 ```
 conda install pytorch==1.7.0 torchvision==0.8.0 torchaudio==0.7.0 cudatoolkit=11.0 -c pytorch
 pip install openmim
 mim install mmdet
 ```
 
-3. Update mmdetection to custom need
+### 3. Update mmdetection to custom need
 ```
 cd mmdetection
 python setup.py install
@@ -199,6 +199,8 @@ python tools/dataset_converters/images2coco.py <data_dir>/nucleus_data/test <dat
 * output: `instance_test.json`
 
 ### 2. Generate testing results
+Before testing, please ensure the test image folder path and the path of `instance_test.json` are correct in the model configuration file
+
 ```
 python tools/test.py <config_file_path> <save_dir>/train/epoch_<X>.json --format-only --options "jsonfile_prefix=test" --show
 ```
@@ -216,6 +218,7 @@ python tools/test.py <config_file_path> <save_dir>/train/epoch_<X>.json --format
 
 ## Results and Models
 <div id='results'></div>
+
 | **Model** | **Backbone** | **Lr_schd** | **Mask AP** | **Config** | **Download** |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Mask RCNN | R50 | 3x | 0.2323 | [config](mmdetection/configs/nucleus/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_nucleus.py) | [model](https://drive.google.com/file/d/1SbvaWoegYhEm9nUAdJVGnZEIy_inyAeW/view?usp=sharing) |
@@ -237,6 +240,9 @@ To reproduce our best results, do the following steps:
 6. <a href='#results'>Download checkpoints</a>
 7. [Testing](#testing)
 8. [Submit the results](#submit-the-results)
+
+## FAQ
+If any problem occurs when you are using this project, you can first check out [faq.md](docs/faq.md) to see if there are solutions to your problem.
 
 ## GitHub Acknowledgement
 We thank the authors of these repositories:
