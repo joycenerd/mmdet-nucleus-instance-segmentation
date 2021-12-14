@@ -8,9 +8,9 @@ import glob
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--mode',type=str,default='train',help='train or val')
-parser.add_argument('--data_root',type=str,default='/eva_data/zchin/nucleus_data')
-parser.add_argument('--mask_root',type=str,default='/eva_data/zchin/dataset/train')
-parser.add_argument('--out_dir',type=str,default='/eva_data/zchin/nucleus_data/annotations')
+parser.add_argument('--data_root',type=str,default='/work/zchin31415/nucleus_data')
+parser.add_argument('--mask_root',type=str,default='/work/zchin31415/dataset/train')
+parser.add_argument('--out_dir',type=str,default='/work/zchin31415/nucleus_data/annotations')
 args=parser.parse_args()
 
 
@@ -49,12 +49,13 @@ def convert(data_list,mask_list,mode,annot_dir):
         print(f'{name} complete...')
         
     t = dataset.coco() # 将dataset转化为coco格式的，还可以转化为yolo等格式
-    with open(f'{annot_dir}/instance_{mode}.json', 'w') as output_json_file: # 最后输出为json数据
+    with open(f'{annot_dir}/instance_all_{mode}.json', 'w') as output_json_file: # 最后输出为json数据
         json.dump(t, output_json_file,indent=4)
 
 
 if __name__=='__main__':
-    data_path=os.path.join(args.data_root,args.mode)
+    # data_path=os.path.join(args.data_root,args.mode)
+    data_path=os.path.join(args.data_root,'all_train')
     annot_dir=os.path.join(args.data_root,'annotations')
     if not os.path.isdir(annot_dir):
         os.mkdir(annot_dir)
