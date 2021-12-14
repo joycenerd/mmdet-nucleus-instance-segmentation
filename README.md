@@ -124,11 +124,11 @@ dataset
 
 ### Data pre-processing
 
-**Note: If you download the data by following option#1 you can split this step.**
+**Note: If you download the data by following option#1 you can skip this step.**
 
 If your raw data folder structure is different, you will need to modify [train_val_split.py](./train_val_split.py) and [mask2coco.py](./mask2coco.py) before executing the code.
 
-1. train valid split
+#### 1. train valid split
 In default we split the whole training set to 80% for training and 20% for validation.
 ```
 python train_valid_split.py --data-root <save_dir>/dataset/train --ratio 0.2 --out-dir <save_dir>/nucleus_data
@@ -136,7 +136,7 @@ python train_valid_split.py --data-root <save_dir>/dataset/train --ratio 0.2 --o
   * input: original whole training image directory
   * output: new data dir name `nucleus_data`, inside this directory there will be to folders `train/` and `val/` with images inside 
 
-2. convert binary mask images into COCO segmentation annotation.
+#### 2. convert binary mask images into COCO segmentation annotation.
 ```
 python mask2coco.py --mode <train_or_val> --data_root <save_dir>/nucleus_data/<train_or_val> --mask_root <save_dir>/dataset/train --out_dir <save_dir>/nucleus_data/annotations
 ```
@@ -149,7 +149,8 @@ python mask2coco.py --mode <train_or_val> --data_root <save_dir>/nucleus_data/<t
 
 You should have Graphics card to train the model. For your reference, we trained on a single NVIDIA Tesla V100.
 
-1. Download the pre-trained weights (pre-trained on COCO)
+### 1. Download the pre-trained weights (pre-trained on COCO)
+<div id="pre-trained"></div>
 
 | **Model** | **Backbone** | **Lr_schd** | **Download** |
 |:---:|:---:|:---:|:---:|
@@ -160,103 +161,96 @@ You should have Graphics card to train the model. For your reference, we trained
 | PointRend | R50 | 3x | [model](https://download.openmmlab.com/mmdetection/v2.0/point_rend/point_rend_r50_caffe_fpn_mstrain_3x_coco/point_rend_r50_caffe_fpn_mstrain_3x_coco-e0ebb6b7.pth) |
 | Mask Scoring RCNN | X101 | 1x | [model](https://download.openmmlab.com/mmdetection/v2.0/ms_rcnn/ms_rcnn_x101_32x4d_fpn_1x_coco/ms_rcnn_x101_32x4d_fpn_1x_coco_20200206-81fd1740.pth) |
 
+### 2. Modify config file
+<div id='config'></div>
 
+Go to [Results and Models](#results-and-models) and find model configuration you want to train. You will need to modify the configuration file in order to train the model. Things you need to modify are:
+* `ann_file` and `img_prefix` in the data section
+* Put the downloaded pre-trained weights path in `load_from`
 
-
+### 3. Train the model
+```
+python tools/train.py <config_file_path> --work-dir <save_dir>/train
+```
+* input: model configuration file
+* output: checkpoints every epoch and training logs will be saved in `<save_dir>/train`
 
 ## Validation
-You can validate your training results by the following recommendation command:
+In the configuration file, the testing `ann_file` and `img_prefix` should put the validation data path, not the testing data path because test data doesn't has ground truth.
 ```
-cd yolov5
-python val.py --data data/custom-data.yaml --weights <ckpt_path> --device <gpu_ids> --project <val_log_dir>
+python tools/test.py <config_file_path> <save_dir>/train/epoch<X>.pth --eval bbox segm --work-dir <save_dir>/val
 ```
-
-* input: your model checkpoint path
+* input: 
+  * model configuration file
+  *  checkpoint you save at the last step
+* output: validation logs
 
 ## Testing
 
-You can do detection on the testing set by the following recommendation commend:
+### 1. Convert image to coco format
+**Note: If you download the data by following option#1 in [Dataset](#dataset) section you can skip this step.**
 ```
-cd yolov5
-python detect.py --weights <ckpt_path> --source <test_data_dir_path> --save-txt --device <gpu_id> --save-conf --nosave
+python tools/dataset_converters/images2coco.py <data_dir>/nucleus_data/test <data_dir>/nucleus_data/classes.txt instance_test.json --imgid_json <data_dir>/nucleus_data/annotations/test_img_ids.json
 ```
-
 * input: 
+  * test image directory
+  * `classes.txt`: class names
+  * `test_img_ids.json`: test image id
+* output: `instance_test.json`
+
+### 2. Generate testing results
+```
+python tools/test.py <config_file_path> <save_dir>/train/epoch_<X>.json --format-only --options "jsonfile_prefix=test" --show
+```
+* input: 
+  * model configuration file
   * trained model checkpoint
-  * testing images 
-* output: `yolov5/runs/detect/exp<X>/labels/`will be generated, inside this folder will have text files with the same name as the testing images, and inside each text file is the detection results of the correspoding testing image in YOLO format.
-
-There is another way that you don't need to do post-processing afterward:
-```
-cd yolov5
-python val.py --data data/custom-data.yaml --weights <ckpt_path> --device <gpu_id> --project <test_log_dir> --task test --save-txt --save-conf --save-json
-```
-
-* input: training model checkpoint
-* output: `test_log_dir/exp<X>/<ckpt_name>.json` -> this is the COCO format detection result of the test set.
-
-## Post-processing
-
-Turn YOLO format detection results into COCO format.
-```
-python yolo2coco.py --yolo-path <detect_label_dir>
-```
-* input: detection results in the testing step.
-* output: `answer.json`
+* output:
+  * `test.segm.json`: instance segmentation results
+  * `test.bbox.json`: detection results
 
 ## Submit the results
-Run this command to compress your submission file:
-```
-zip answer.zip answer.json
-```
-You can upload `answer.zip` to the challenge. Then you can get your testing score.
+1. rename the result file: `mv test.segm.json answer.json`
+2. compress the file: `zip answer.zip answer.json`
+3. upload the result to CodaLab to get the testing score
 
-## Pre-trained models
+## Results and Models
+<div id='results'></div>
+| **Model** | **Backbone** | **Lr_schd** | **Mask AP** | **Config** | **Download** |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| Mask RCNN | R50 | 3x | 0.2323 | [config](mmdetection/configs/nucleus/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_nucleus.py) | [model](https://drive.google.com/file/d/1SbvaWoegYhEm9nUAdJVGnZEIy_inyAeW/view?usp=sharing) |
+| Mask RCNN | X101 | 3x | 0.2316 | [config](mmdetection/configs/nucleus/mask_rcnn_x101_32x8d_fpn_mstrain-poly_3x_nucleus.py) | - |
+| Cascade Mask RCNN | R50 | 3x | 0.2428 | [config](mmdetection/configs/nucleus/cascade_mask_rcnn_r50_caffe_fpn_mstrain_3x_nucleus.py) | [model](https://drive.google.com/file/d/1-Qjsfxg5_gG9PpwyOXBa4_ogygJyxxN7/view?usp=sharing) |
+| Cascade Mask RCNN | X101 | 3x | 0.2444 | [config](mmdetection/configs/nucleus/cascade_mask_rcnn_x101_32x4d_fpn_mstrain_3x_nucleus.py) | [model](https://drive.google.com/file/d/1wSgynRlrb9Y8yK1r_xmRQloYFlN7KPRN/view?usp=sharing) |
+| PointRend | R50 | 3x | 0.2439 | [config](mmdetection/configs/nucleus/point_rend_r50_caffe_fpn_mstrain_3x_nucleus.py) | [model](https://drive.google.com/file/d/1XrkKaJdMoOXZodlzAj4lMx8gccBQu7Rs/view?usp=sharing) |
+| Mask Scoring RCNN | X101 | 1x | 0.2420 | [config](mmdetection/configs/nucleus/ms_rcnn_x101_32x4d_fpn_1x_nucleus.py) | [model](https://drive.google.com/file/d/1-lftdJXJRVpDhzhIMfXrfDNaoqUoRvFP/view?usp=sharing) |
 
-Go to [Releases](https://github.com/yolov5-svhn-detection/releases). Under **My YOLOv5s model** download `yolov5_best.pt`. This pre-trained model get score 0.4217 on the SVHN testing set.
 
 ## Inference
-To reproduce our results, run this command:
-```
-cd yolov5
-python val.py --data data/custom-data.yaml --weights <yolov5_best.pt_path> --device <gpu_id> --project <test_log_dir> --task test --save-txt --save-conf --save-json
-```
-
-## Benchmark the speed
-Open `inference.ipynb` using Google Colab and follow the instruction in it.
-
-## Reproducing Submission
-
-To reproduce our submission without retraining, do the following steps
-
+**Note we use Cascade Mask RCNN as our model with X101 as our backbone**
+To reproduce our best results, do the following steps:
 1. [Getting the code](#getting-the-code)
 2. [Install the dependencies](#requirements)
-3. [Download the data and data pre-processing](#dataset)
-4. [Download pre-trained models](#pre-trained-models)
-5. [Inference](#inference)
-6. [Submit the results](#submit-the-results)
-
-## Results
-
-* Testing score:
-
-| conf_thres | 0.25   | 0.01   | 0.001  |
-|------------|--------|--------|--------|
-| score      | 0.4067 | 0.4172 | 0.4217 |
-* Detection speed: 22.7ms per image
+3. [Download the data](#dataset): please download the data by following **option#1**
+4. <a href="#pre-trained">Download pre-trained weights</a>
+5. <a href="#config">Modify config file</a>: 
+6. <a href='#results'>Download checkpoints</a>
+7. [Testing](#testing)
+8. [Submit the results](#submit-the-results)
 
 ## GitHub Acknowledgement
 We thank the authors of these repositories:
-* [ultralytics/yolov5](https://github.com/ultralytics/yolov5)
+* [open-mmlab/mmdetection](https://github.com/open-mmlab/mmdetection)
+* [jsbroks/imantics](https://github.com/jsbroks/imantics)
 
 ## Citation
 If you find our work useful in your project, please cite:
 
 ```bibtex
 @misc{
-    title = {yolov5-schn-detection},
+    title = {mmdet-nucleus-instance-segmentation},
     author = {Zhi-Yi Chin},
-    url = {https://github.com/joycenerd/yolov5-schn-detection},
+    url = {https://github.com/joycenerd/mmdet-nucleus-instance-segmentation},
     year = {2021}
 }
 ```
