@@ -42,9 +42,9 @@ cd mmdetection
 python setup.py install
 ``` 
 
-For more information please visit: [get_started.md](https://github.com/open-mmlab/mmdetection/blob/master/docs/get_started.md)
+For more information please visit: [get_started.md](./mmdetection/docs/get_started.md)
 
-3. Install imantics (for converting COCO segmentation annotation)
+### 4. Install imantics (for converting COCO segmentation annotation)
 ```
 pip install imantics
 ```
@@ -126,7 +126,7 @@ dataset
 
 **Note: If you download the data by following option#1 you can skip this step.**
 
-If your raw data folder structure is different, you will need to modify [train_val_split.py](./train_val_split.py) and [mask2coco.py](./mask2coco.py) before executing the code.
+If your raw data folder structure is different, you will need to modify [train_valid_split.py](./train_valid_split.py) and [mask2coco.py](./mask2coco.py) before executing the code.
 
 #### 1. train valid split
 In default we split the whole training set to 80% for training and 20% for validation.
@@ -167,6 +167,10 @@ You should have Graphics card to train the model. For your reference, we trained
 Go to [Results and Models](#results-and-models) and find model configuration you want to train. You will need to modify the configuration file in order to train the model. Things you need to modify are:
 * `ann_file` and `img_prefix` in the data section
 * Put the downloaded pre-trained weights path in `load_from`
+
+**Tips: We get a better results when using all 24 images for training. You can try img_prefix: all_train and ann_file: instance_all_train.json**
+
+Also, you can find all my custom configuration files in [mmdetection/configs/nucleus](mmdetection/configs/nucleus), you can modify with your own need.
 
 ### 3. Train the model
 ```
