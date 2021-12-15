@@ -5,9 +5,9 @@ _base_ = '../cascade_rcnn/cascade_mask_rcnn_r50_caffe_fpn_mstrain_3x_coco.py'
 model = dict(
     roi_head=dict(
         bbox_head=[
-            dict(type='Shared2FCBBoxHead',num_classes=1),
-            dict(type='Shared2FCBBoxHead',num_classes=1),
-            dict(type='Shared2FCBBoxHead',num_classes=1)
+            dict(type='Shared2FCBBoxHead', num_classes=1),
+            dict(type='Shared2FCBBoxHead', num_classes=1),
+            dict(type='Shared2FCBBoxHead', num_classes=1)
         ],
         mask_head=dict(num_classes=1)
     ),
@@ -34,7 +34,7 @@ runner = dict(type='EpochBasedRunner', max_epochs=200)
 # use caffe img_norm
 img_norm_cfg = dict(
     mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
-    
+
 test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
@@ -78,19 +78,18 @@ data = dict(
         times=3,
         dataset=dict(
             type='CocoDataset',
-            ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+            ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
             img_prefix='/work/zchin31415/nucleus_data/all_train',
             # classes=('tennis', )
             pipeline=train_pipeline
         ),
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         img_prefix='/work/zchin31415/nucleus_data/all_train'),
     val=dict(
         type=dataset_type,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         img_prefix='/work/zchin31415/nucleus_data/all_train',
-        # spipeline=test_pipeline,
         classes=classes),
     test=dict(
         type=dataset_type,
@@ -98,12 +97,6 @@ data = dict(
         img_prefix='/work/zchin31415/nucleus_data/test',
         pipeline=test_pipeline,
         classes=classes)
-    # test=dict(
-    #     type=dataset_type,
-    #     ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json',
-    #     img_prefix='/work/zchin31415/nucleus_data/val/',
-    #     pipeline=test_pipeline,
-    #     classes=classes)
 )
-    
-load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/cascade_mask_rcnn_r50_caffe_fpn_mstrain_3x_coco_20210707_002651-6e29b3a6.pth'
+
+load_from = '/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/cascade_mask_rcnn_r50_caffe_fpn_mstrain_3x_coco_20210707_002651-6e29b3a6.pth'

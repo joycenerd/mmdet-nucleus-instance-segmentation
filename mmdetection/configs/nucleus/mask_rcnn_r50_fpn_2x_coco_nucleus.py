@@ -8,22 +8,22 @@ model = dict(
         mask_head=dict(num_classes=1)))
 
 # Modify dataset related settings
-dataset_type = 'COCODataset'
+dataset_type = 'Cocoataset'
 classes = ('nucleus',)
 data = dict(
     train=dict(
-        img_prefix='/eva_data/zchin/nucleus_data/train',
+        img_prefix='/eva_data/zchin/nucleus_data/all_train',
         classes=classes,
-        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_train.json'),
+        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_all_train.json'),
     val=dict(
-        img_prefix='/eva_data/zchin/nucleus_data/val',
+        img_prefix='/eva_data/zchin/nucleus_data/all_train',
         classes=classes,
-        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_val.json'),
+        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_all_train.json'),
     test=dict(
-        img_prefix='/eva_data/zchin/nucleus_data/val',
+        img_prefix='/eva_data/zchin/nucleus_data/test',
         classes=classes,
-        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_val.json')
-    )
+        ann_file='/eva_data/zchin/nucleus_data/annotations/instance_test.json')
+)
 
 # We can use the pre-trained Mask RCNN model to obtain higher performance
 load_from = '/home/zchin/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r50_caffe_fpn_1x_coco_bbox_mAP-0.38__segm_mAP-0.344_20200504_231812-0ebd1859.pth'

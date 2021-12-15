@@ -14,7 +14,7 @@ model = dict(
         point_head=dict(
             type='MaskPointHead',
             num_classes=1,
-            coarse_pred_each_layer=True 
+            coarse_pred_each_layer=True
         ),
         bbox_head=dict(
             type='Shared2FCBBoxHead',
@@ -28,7 +28,7 @@ img_norm_cfg = dict(
 
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True,poly2mask=False),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True, poly2mask=False),
     dict(
         type='Resize',
         img_scale=[(1333, 640), (1333, 672), (1333, 704), (1333, 736),
@@ -70,17 +70,17 @@ data = dict(
     train=dict(
         img_prefix='/work/zchin31415/nucleus_data/all_train',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         pipeline=train_pipeline),
     val=dict(
         img_prefix='/work/zchin31415/nucleus_data/all_train',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         pipeline=test_pipeline),
     test=dict(
         img_prefix='/work/zchin31415/nucleus_data/test',
         classes=classes,
         ann_file='/work/zchin31415/nucleus_data/annotations/instance_test.json'),
-        pipeline = test_pipeline)
+    pipeline=test_pipeline)
 
-load_from='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/point_rend_r50_caffe_fpn_mstrain_3x_coco-e0ebb6b7.pth'
+load_from = '/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/point_rend_r50_caffe_fpn_mstrain_3x_coco-e0ebb6b7.pth'

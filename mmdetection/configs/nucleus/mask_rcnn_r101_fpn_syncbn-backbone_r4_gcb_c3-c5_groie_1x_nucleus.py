@@ -1,7 +1,7 @@
-_base_='../groie/mask_rcnn_r101_fpn_syncbn-backbone_r4_gcb_c3-c5_groie_1x_coco.py'
+_base_ = '../groie/mask_rcnn_r101_fpn_syncbn-backbone_r4_gcb_c3-c5_groie_1x_coco.py'
 
-model=dict(
-    backbone=dict(norm_cfg=dict(type='BN',requires_grad=True)),
+model = dict(
+    backbone=dict(norm_cfg=dict(type='BN', requires_grad=True)),
     roi_head=dict(
         bbox_head=dict(num_classes=1),
         mask_head=dict(num_classes=1)),
@@ -10,7 +10,7 @@ model=dict(
 # dataset settings
 dataset_type = 'CocoDataset'
 data_root = '/work/zchin31415/nucleus_data/'
-classes=('nucleus',)
+classes = ('nucleus',)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
 
 img_norm_cfg = dict(
@@ -45,13 +45,13 @@ data = dict(
     workers_per_gpu=1,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/nuclei.json',
+        ann_file=data_root + 'annotations/instance_all_train.json',
         img_prefix=data_root + 'all_train/',
         classes=classes,
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/nuclei.json',
+        ann_file=data_root + 'annotations/instance_all_train.json',
         img_prefix=data_root + 'all_train/',
         classes=classes,
         pipeline=test_pipeline),
@@ -62,4 +62,4 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 
-load_from='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r101_fpn_syncbn-backbone_r4_gcb_c3-c5_groie_1x_coco_20200607_224507-8daae01c.pth'
+load_from = '/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/mask_rcnn_r101_fpn_syncbn-backbone_r4_gcb_c3-c5_groie_1x_coco_20200607_224507-8daae01c.pth'

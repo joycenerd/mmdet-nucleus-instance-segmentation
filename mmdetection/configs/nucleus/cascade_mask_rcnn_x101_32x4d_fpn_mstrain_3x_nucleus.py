@@ -5,9 +5,9 @@ _base_ = '../cascade_rcnn/cascade_mask_rcnn_x101_32x4d_fpn_mstrain_3x_coco.py'
 model = dict(
     roi_head=dict(
         bbox_head=[
-            dict(type='Shared2FCBBoxHead',num_classes=1),
-            dict(type='Shared2FCBBoxHead',num_classes=1),
-            dict(type='Shared2FCBBoxHead',num_classes=1)
+            dict(type='Shared2FCBBoxHead', num_classes=1),
+            dict(type='Shared2FCBBoxHead', num_classes=1),
+            dict(type='Shared2FCBBoxHead', num_classes=1)
         ],
         mask_head=dict(num_classes=1)
     )
@@ -19,24 +19,24 @@ classes = ('nucleus',)
 runner = dict(type='EpochBasedRunner', max_epochs=200)
 
 test_pipeline = [
-   dict(type='LoadImageFromFile'),
-   dict(
-       type='MultiScaleFlipAug',
-       img_scale=(1333, 800),
-       flip=False,
-       transforms=[
-           dict(type='Resize', keep_ratio=True),
-           dict(type='RandomFlip'),
-           dict(
-            type='Normalize',
-            mean=[123.675, 116.28, 103.53],
-            std=[58.395, 57.12, 57.375],
-            to_rgb=True),
-           dict(type='Pad', size_divisor=32),
-           dict(type='DefaultFormatBundle'),
-           dict(type='Collect', keys=['img']),
-       ])
-   ]
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(1333, 800),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img']),
+        ])
+]
 
 train_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -65,19 +65,18 @@ data = dict(
         times=3,
         dataset=dict(
             type='CocoDataset',
-            ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+            ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
             img_prefix='/work/zchin31415/nucleus_data/all_train',
             # classes=('tennis', )
             pipeline=train_pipeline
         ),
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         img_prefix='/work/zchin31415/nucleus_data/all_train'),
     val=dict(
         type=dataset_type,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         img_prefix='/work/zchin31415/nucleus_data/all_train',
-        # spipeline=test_pipeline,
         classes=classes),
     test=dict(
         type=dataset_type,
@@ -85,12 +84,6 @@ data = dict(
         img_prefix='/work/zchin31415/nucleus_data/test',
         pipeline=test_pipeline,
         classes=classes)
-    # test=dict(
-    #     type=dataset_type,
-    #     ann_file='/work/zchin31415/nucleus_data/annotations/instance_val.json',
-    #     img_prefix='/work/zchin31415/nucleus_data/val/',
-    #     pipeline=test_pipeline,
-    #     classes=classes)
 )
-    
-load_from ='/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/cascade_mask_rcnn_x101_32x4d_fpn_mstrain_3x_coco_20210706_225234-40773067.pth'
+
+load_from = '/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/cascade_mask_rcnn_x101_32x4d_fpn_mstrain_3x_coco_20210706_225234-40773067.pth'

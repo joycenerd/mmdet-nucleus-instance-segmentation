@@ -1,4 +1,4 @@
-_base_='../ms_rcnn/ms_rcnn_x101_32x4d_fpn_1x_coco.py'
+_base_ = '../ms_rcnn/ms_rcnn_x101_32x4d_fpn_1x_coco.py'
 
 # We also need to change the num_classes in head to match the dataset's annotation
 model = dict(
@@ -14,7 +14,7 @@ model = dict(
         mask_head=dict(
             type='FCNMaskHead',
             num_classes=1)
-    ),    
+    ),
 )
 
 img_norm_cfg = dict(
@@ -22,7 +22,7 @@ img_norm_cfg = dict(
 
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True,poly2mask=False),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True, poly2mask=False),
     dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
@@ -57,19 +57,19 @@ data = dict(
     train=dict(
         img_prefix='/work/zchin31415/nucleus_data/all_train',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         pipeline=train_pipeline),
     val=dict(
         img_prefix='/work/zchin31415/nucleus_data/all_train',
         classes=classes,
-        ann_file='/work/zchin31415/nucleus_data/annotations/nuclei.json',
+        ann_file='/work/zchin31415/nucleus_data/annotations/instance_all_train.json',
         pipeline=test_pipeline),
     test=dict(
         img_prefix='/work/zchin31415/nucleus_data/test',
         classes=classes,
         ann_file='/work/zchin31415/nucleus_data/annotations/instance_test.json',
         pipeline=test_pipeline)
-    )
+)
 
 # We can use the pre-trained Mask RCNN model to obtain higher performance
 load_from = '/home/zchin31415/mmdet-nucleus-instance-segmentation/mmdetection/checkpoints/ms_rcnn_x101_32x4d_fpn_1x_coco_20200206-81fd1740.pth'
